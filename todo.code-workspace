@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Webpack-2"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "todo"
+	}
+}
