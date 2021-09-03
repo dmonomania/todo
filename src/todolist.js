@@ -1,43 +1,52 @@
-const testToDoArray = [
-  21,
-  "Walk the dog",
-  "I really need to walk the dog to keep him healthy.",
-  "Web Development",
-  "due date",
-  false,
-  "high",
-];
-const testToDoArray2 = [
-  222,
-  "Build a ToDo App",
-  "Bulid a rocking ToDo app so you can take over the world",
-  "Web Development",
-  "due date",
-  false,
-  "high",
-];
-const testToDoArray3 = [
-  111,
-  "Learn Guitar",
-  "Rock out man!!",
-  "Hobbies",
-  "due date",
-  false,
-  "high",
-];
-const testToDoArray4 = [
-  333,
-  "Do the grocery shopping",
-  "Milk, Eggs, Butter, BEER!",
-  "Household",
-  "due date",
-  true,
-  "high",
-];
 
-const tempProjectsArray = ["Pets", "Web Development", "Hobbies", "Household"];
+export const tempData = (() => {
 
-const toDoListManager = (() => {
+    const testToDoArray = [
+      21,
+      "Walk the dog",
+      "I really need to walk the dog to keep him healthy.",
+      "Web Development",
+      "due date",
+      false,
+      "high",
+    ];
+    const testToDoArray2 = [
+      222,
+      "Build a ToDo App",
+      "Bulid a rocking ToDo app so you can take over the world",
+      "Web Development",
+      "due date",
+      false,
+      "high",
+    ];
+    const testToDoArray3 = [
+      111,
+      "Learn Guitar",
+      "Rock out man!!",
+      "Hobbies",
+      "due date",
+      false,
+      "high",
+    ];
+    const testToDoArray4 = [
+      333,
+      "Do the grocery shopping",
+      "Milk, Eggs, Butter, BEER!",
+      "Household",
+      "due date",
+      true,
+      "high",
+    ];
+    
+  const tempProjectsArray = ["Pets", "Web Development", "Hobbies", "Household"];
+
+  return {
+      tempProjectsArray,
+
+  }
+})()
+
+export const toDoListManager = (() => {
   const toDoList = [];
 
   // Factory function to create the individual ToDo item.
@@ -58,8 +67,8 @@ const toDoListManager = (() => {
     toDoList.push(...loadedToDoListArray);
   };
   // add a single object (toDoListItem) into the toDoList Array
-  const addToDoListItem = (toDoListItemArray) => {
-    toDoList.push(toDoFactory(...toDoListItemArray));
+  const addToDoListItem = (toDoListItemObject) => {
+    toDoList.push(toDoListItemObject);
   };
 
   // Temporary Update Function. Removes entire previous ToDo Item and replaces
@@ -94,6 +103,8 @@ const toDoListManager = (() => {
     return toDoList;
   };
 
+  
+
   return {
     loadSavedToDoList,
     addToDoListItem,
@@ -104,7 +115,7 @@ const toDoListManager = (() => {
   };
 })();
 
-const projectsMangager = (() => {
+export const projectsManager = (() => {
   const projectsList = [];
 
   const loadSavedToProjectsList = (loadedProjectsListArray) => {
@@ -136,16 +147,3 @@ const projectsMangager = (() => {
   };
 })();
 
-let tempToDoList = toDoListManager.readToDoList();
-let tempProjectsList = projectsMangager.readProjects();
-
-toDoListManager.addToDoListItem(testToDoArray);
-toDoListManager.addToDoListItem(testToDoArray2);
-toDoListManager.addToDoListItem(testToDoArray3);
-toDoListManager.addToDoListItem(testToDoArray4);
-projectsMangager.loadSavedToProjectsList(tempProjectsArray);
-
-projectsMangager.updateProject("Web Development", "WebDev");
-toDoListManager.tempUpdateProject("Web Development", "WebDev");
-
-console.log(tempToDoList);
