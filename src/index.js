@@ -1,42 +1,43 @@
 import { toDoListManager } from "./todolist.js";
 import { projectsManager } from "./todolist.js";
-import { formBuilding } from './dombuild.js';
-import { v4 as uuidv4 } from "uuid";
+import { formBuilding, toDoDomStuff } from './dombuild.js';
+import { accessLocalStorage } from "./storage.js";
 
 
+
+const storageRead = accessLocalStorage.readStorage('toDoList')
+console.log(storageRead);
 
 // Temp Data
 import {tempData} from "./todolist.js"
 projectsManager.loadSavedToProjectsList(tempData.tempProjectsArray)
-console.log (projectsManager.readProjects());
 // END Temp Data
 
 formBuilding.buildToDoForm('New ToDo',projectsManager.readProjects());
 
-const submitButton = document.querySelector("#new-todo");
+window.onload = () => {
+  const savedToDoList = accessLocalStorage.readStorage('toDoList');
+  if (!savedToDoList.length == 0){
+    toDoListManager.loadSavedToDoList(savedToDoList);
 
-submitButton.addEventListener("submit", (e) => {
-  e.preventDefault();
-  let fd = new FormData(e.target);
-  // TODO: #1 decouple newToDoSubmit function from button event function.
-  newToDoSubmit(fd);
-});
+  }
+}
 
-const newToDoSubmit = (formData) => {
-  const appendedFormData = appendToDoAttributes(formData);
+console.log(toDoListManager.readToDoList())
+
+
+export const newToDoSubmit = (formData) => {
+  const appendedFormData = toDoListManager.appendToDoAttributes(formData);
   const toDoListItemObject = Object.fromEntries(appendedFormData);
   toDoListManager.addToDoListItem(toDoListItemObject);
+  // save current toDoList to Local Storage
+  accessLocalStorage.clearAndWrite('toDoList',toDoListManager.readToDoList())
+  
   // TODO: #2 decouple printNextToDo from the newToDoSubmit function. 
-  printNextToDo(toDoListItemObject);
+  toDoDomStuff.printNextToDo(toDoListItemObject);
+  // Add 
+
 };
 
-const appendToDoAttributes = (formData) => {
-  formData.append("id", uuidv4());
-  formData.append("completed", false);
-  return formData;
-};
 
-const printNextToDo = (object) => {
-    console.log('printing next to do');
-    console.log(object)
-}
+

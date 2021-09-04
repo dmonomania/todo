@@ -1,3 +1,5 @@
+import { newToDoSubmit } from "./index.js";
+
 export const formBuilding = (() => {
   const buildModal = (header) => {
     // create the modal
@@ -48,78 +50,111 @@ export const formBuilding = (() => {
 
     return modalBody;
   };
-  const toDoFormBody = (projectsArray,object) => {
-    const label = (labelClass,labelFor,innerText) => {
-        const label = document.createElement('label') 
-        label.innerHTML = `<label class='${labelClass}' for='${labelFor}'>${innerText}</label>`
-        return label;
+  const toDoFormBody = (projectsArray, object) => {
+    const label = (labelClass, labelFor, innerText) => {
+      const label = document.createElement("label");
+      label.innerHTML = `<label class='${labelClass}' for='${labelFor}'>${innerText}</label>`;
+      return label;
+    };
 
-    }
-
-    
-    
     const form = document.createElement("form");
-    form.setAttribute('id','new-todo');
-    form.classList.add('form');
-    
-    const titleLabel = label('form-label','title','Title')
-    form.appendChild(titleLabel);
+    form.setAttribute("id", "new-todo");
+    form.classList.add("form");
 
-    const titleInput = document.createElement('input');
-    titleInput.setAttribute('class','form-input');
-    titleInput.setAttribute('name','title');
-    titleInput.setAttribute('type','text');
-    titleInput.setAttribute('placeholder','Title')
-    form.appendChild(titleInput)
-    
-    const descLabel = label('form-label','description','Description')
-    form.appendChild(descLabel);
-    
-    const descInput = document.createElement('textarea');
-    descInput.setAttribute('name','description');
-    descInput.setAttribute('class','form-input');
-    descInput.setAttribute('placeholder','Description');
-    descInput.setAttribute('rows','3');
-    form.appendChild(descInput)
+    const formGroup = document.createElement("div");
+    formGroup.classList.add("form-group");
 
-    
-    const projectLabel = label('form-label','project','Project')
-    form.appendChild(projectLabel);
+    form.appendChild(formGroup);
 
-    const projectSelect = document.createElement('select');
-    projectSelect.setAttribute('name','project');
-    projectSelect.classList.add('form-select','form-inline','my-2');
+    const titleLabel = label("form-label", "title", "Title");
+    formGroup.appendChild(titleLabel);
+
+    const titleInput = document.createElement("input");
+    titleInput.setAttribute("class", "form-input");
+    titleInput.setAttribute("name", "title");
+    titleInput.setAttribute("type", "text");
+    titleInput.setAttribute("placeholder", "Title");
+    titleInput.setAttribute('required','required');
+    formGroup.appendChild(titleInput);
+    
+    const descLabel = label("form-label", "description", "Description");
+    formGroup.appendChild(descLabel);
+    
+    const descInput = document.createElement("textarea");
+    descInput.setAttribute('required','required');
+    descInput.setAttribute("name", "description");
+    descInput.setAttribute("class", "form-input");
+    descInput.setAttribute("placeholder", "Description");
+    descInput.setAttribute("rows", "3");
+    formGroup.appendChild(descInput);
+    
+    const projectLabel = label("form-label", "project", "Project");
+    formGroup.appendChild(projectLabel);
+    
+    const projectSelect = document.createElement("select");
+    projectSelect.setAttribute("name", "project");
+    projectSelect.classList.add("form-select", "form-inline", "my-2");
     if (projectsArray === undefined) {
-        
     } else {
-
-        projectsArray.forEach(element => {
-            const option = document.createElement('option');
-            option.innerText = element;
-            projectSelect.appendChild(option);
-            
-        });
+      projectsArray.forEach((element) => {
+        const option = document.createElement("option");
+        option.innerText = element;
+        projectSelect.appendChild(option);
+      });
     }
-    form.appendChild(projectSelect);
-
+    formGroup.appendChild(projectSelect);
     
-    const priorityLabel = label('form-label','priority','Priority')
-    form.appendChild(priorityLabel);
+    const priorityLabel = label("form-label", "priority", "Priority");
+    formGroup.appendChild(priorityLabel);
     
-    const 
-
-    const dueDateLabel = label('form-label','due-date','Due Date')
-    form.appendChild(dueDateLabel);
-
-
-
+    const prioritySelect = document.createElement("select");
+    prioritySelect.setAttribute("name", "priority");
+    prioritySelect.classList.add("form-select", "form-inline", "my-2");
     
+    const optionLow = document.createElement("option");
+    optionLow.innerText = "Low";
+    const optionMed = document.createElement("option");
+    optionMed.innerText = "Medium";
+    const optionHigh = document.createElement("option");
+    optionHigh.innerText = "High";
+    
+    prioritySelect.appendChild(optionLow);
+    prioritySelect.appendChild(optionMed);
+    prioritySelect.appendChild(optionHigh);
+    
+    formGroup.appendChild(prioritySelect);
+    
+    const dueDateLabel = label("form-label", "due-date", "Due Date");
+    formGroup.appendChild(dueDateLabel);
+    
+    const dueDateInput = document.createElement("input");
+    dueDateInput.classList.add("form-input", "form-inline");
+    dueDateInput.setAttribute("type", "date");
+    dueDateInput.setAttribute("name", "dueDate");
+    
+    formGroup.appendChild(dueDateInput);
+    
+    const submitButton = document.createElement("button");
+    submitButton.setAttribute("type", "submit");
+    submitButton.setAttribute("id", "submit");
+    submitButton.classList.add("btn", "btn-primary");
+    submitButton.innerText = "Add ToDo";
+
+    form.addEventListener("submit", (e) => {
+      formSmashing.removeForm(document.querySelector('.modal'));
+      e.preventDefault();
+      let fd = new FormData(e.target);
+      // TODO: #3 uncouple this function newToDoSubmit from this click event
+      newToDoSubmit(fd);
+    });
+
+    form.appendChild(submitButton);
 
     return form;
   };
-  const buildToDoForm = (header,projects,object) => {
+  const buildToDoForm = (header, projects, object) => {
     const modal = buildModal(header);
-    const formBody = toDoFormBody(projects,object);
+    const formBody = toDoFormBody(projects, object);
 
     modal.appendChild(formBody);
   };
@@ -138,3 +173,15 @@ const formSmashing = (() => {
     removeForm,
   };
 })();
+
+export const toDoDomStuff = (()=>{
+
+  const printNextToDo = (object) => {
+    console.log('printing next to do');
+    console.log(object)
+}
+
+return {
+  printNextToDo
+}
+})()
