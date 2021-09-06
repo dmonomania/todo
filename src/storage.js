@@ -5,12 +5,13 @@ export const accessLocalStorage = (()=>{
     // parses the data and returns
     const readStorage = (key) => {
         const requestedKey = localStorage.getItem(key);
-        let parsedData
+        let parsedData = []
         if (requestedKey && requestedKey.length) {
          parsedData = JSON.parse(requestedKey);
         }
-        
+
         return parsedData
+        
 
     }
     // uses the function paramater as the localStorage key

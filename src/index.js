@@ -1,7 +1,8 @@
 import { toDoListManager } from "./todolist.js";
 import { projectsManager } from "./todolist.js";
-import { formBuilding, toDoDomStuff } from './dombuild.js';
+import { formBuilding, toDoDomStuff, domSmashing } from './dombuild.js';
 import { accessLocalStorage } from "./storage.js";
+
 
 
 
@@ -13,17 +14,22 @@ import {tempData} from "./todolist.js"
 projectsManager.loadSavedToProjectsList(tempData.tempProjectsArray)
 // END Temp Data
 
-formBuilding.buildToDoForm('New ToDo',projectsManager.readProjects());
+const newToDoBtn = document.getElementById('new-to-do')
+newToDoBtn.addEventListener('click',() => {
+  formBuilding.buildToDoForm('New ToDo',projectsManager.readProjects());
+
+})
 
 window.onload = () => {
   const savedToDoList = accessLocalStorage.readStorage('toDoList');
   if (!savedToDoList.length == 0){
     toDoListManager.loadSavedToDoList(savedToDoList);
+    toDoListManager.readToDoList().forEach((e) => {
+      toDoDomStuff.printNextToDo(e);
+    })
 
   }
 }
-
-console.log(toDoListManager.readToDoList())
 
 
 export const newToDoSubmit = (formData) => {
@@ -36,8 +42,29 @@ export const newToDoSubmit = (formData) => {
   // TODO: #2 decouple printNextToDo from the newToDoSubmit function. 
   toDoDomStuff.printNextToDo(toDoListItemObject);
   // Add 
-
+  
 };
 
-
-
+export const handleIconClicks = (task, target) => {
+  switch (task){
+    case 'icon-edit':
+      console.log('icon-edit')
+      break;
+      case 'icon-delete':
+        console.log(target);
+        domSmashing.removeElement(target);
+        toDoListManager.deleteSingleToDoListItem('id',target.id);
+        accessLocalStorage.clearAndWrite('toDoList',toDoListManager.readToDoList())
+        
+        break;
+        case 'icon-check':
+          console.log('icon-check');
+          break;
+          default:
+            console.log(`handleIconClicks found no matches`)
+          }
+        }
+        
+        
+        
+        

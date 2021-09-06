@@ -1,4 +1,5 @@
 import { newToDoSubmit } from "./index.js";
+import { handleIconClicks } from "./index.js";
 
 export const formBuilding = (() => {
   const buildModal = (header) => {
@@ -13,9 +14,9 @@ export const formBuilding = (() => {
     closeButton.setAttribute("class", "modal-overlay");
     closeButton.setAttribute("aria-label", "Close");
     modal.appendChild(closeButton);
-
+    // adds the event listener to close the modal 
     closeButton.addEventListener("click", () => {
-      formSmashing.removeForm(modal);
+      domSmashing.removeElement(modal);
     });
 
     // create the main container holding the header and body
@@ -35,9 +36,9 @@ export const formBuilding = (() => {
     modalHeader.appendChild(closeButton2);
     modalHeader.appendChild(headerTitle);
     modalContainer.appendChild(modalHeader);
-
+    // adds the event listener for closgin the modal. 
     closeButton2.addEventListener("click", () => {
-      formSmashing.removeForm(modal);
+      domSmashing.removeElement(modal);
     });
 
     // creates the modal body which will be returned allowing
@@ -50,8 +51,18 @@ export const formBuilding = (() => {
 
     return modalBody;
   };
+  // creates the form body manually. Except for Project Selector 
+  // which inserts the current list of projects (param: projectsArray)
+  // param: object will be used to update the form with the current
+  // todo item when the "edit" button is clicked instead of NEW ToDo
+
+  // TODO: Each of the form sections should be created with a reusable function
+  // taking an ojbect as a parameter for each of the options. 
+  // i.e. element : input, type : text, class: input-class, name: name, etc.
   const toDoFormBody = (projectsArray, object) => {
     const label = (labelClass, labelFor, innerText) => {
+
+      // simple <label> maker 
       const label = document.createElement("label");
       label.innerHTML = `<label class='${labelClass}' for='${labelFor}'>${innerText}</label>`;
       return label;
@@ -140,8 +151,9 @@ export const formBuilding = (() => {
     submitButton.classList.add("btn", "btn-primary");
     submitButton.innerText = "Add ToDo";
 
+    // event listener to submit the form
     form.addEventListener("submit", (e) => {
-      formSmashing.removeForm(document.querySelector('.modal'));
+      domSmashing.removeElement(document.querySelector('.modal'));
       e.preventDefault();
       let fd = new FormData(e.target);
       // TODO: #3 uncouple this function newToDoSubmit from this click event
@@ -152,6 +164,7 @@ export const formBuilding = (() => {
 
     return form;
   };
+  // main function to build the form in multiple steps
   const buildToDoForm = (header, projects, object) => {
     const modal = buildModal(header);
     const formBody = toDoFormBody(projects, object);
@@ -164,21 +177,74 @@ export const formBuilding = (() => {
   };
 })();
 
-const formSmashing = (() => {
-  const removeForm = (element) => {
+export const domSmashing = (() => {
+  const removeElement = (element) => {
     element.parentNode.removeChild(element);
   };
 
   return {
-    removeForm,
+    removeElement,
   };
 })();
 
+
+// this function should handle of the DOM related changes for the 
+// ToDo List itself. Printing / Deleting / Changing Class(styles) 
+// 
 export const toDoDomStuff = (()=>{
 
   const printNextToDo = (object) => {
-    console.log('printing next to do');
-    console.log(object)
+    
+    const icons = [
+      
+      'icon-edit','icon-delete','icon-check'
+      
+    ]
+    const createIcons = (container) => {
+      for ( let i=0; i <= icons.length; i++){
+
+        const div = document.createElement('div');
+        div.classList.add('flex-centered', 'column', 'col-4', 'col-sm-4')
+        const icon1 = document.createElement('i');
+        icon1.classList.add('icon', icons[i], 'hide-sm')
+        const icon2 = document.createElement('i');
+        icon2.classList.add('icon', 'icon-2x', icons[i], 'show-sm')
+        div.appendChild(icon1);
+        div.appendChild(icon2);
+        icon1.addEventListener('click',(e) => handleIconClicks(icons[i], e.path[3]))
+        icon2.addEventListener('click',(e) => handleIconClicks(icons[i], e.path[3]))
+        container.appendChild(div);
+
+      }
+        
+    }
+
+    const toDoObject = object
+    const toDosColumn = document.getElementById('to-dos-column')
+    const container = document.createElement('div');
+     container.classList.add('columns');
+     container.setAttribute('id',toDoObject.id);
+
+    const titleColumn = document.createElement('div');
+    titleColumn.classList.add('column', 'col-10')
+    const titleText = document.createElement('div');
+    titleText.classList.add('text-large');
+    titleText.innerText = toDoObject.title;
+
+    titleColumn.appendChild(titleText);
+    container.appendChild(titleColumn);
+
+    const iconColumn = document.createElement('div');
+    iconColumn.classList.add('columns','my-2','hide-sm');
+    createIcons(iconColumn)
+
+    container.appendChild(iconColumn);
+
+    const divider = document.createElement('div');
+    divider.classList.add('divider')
+    container.appendChild(divider);
+
+ toDosColumn.appendChild(container);
 }
 
 return {
