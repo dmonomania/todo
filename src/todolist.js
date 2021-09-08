@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+const pubsub = require ('pubsub.js');
 
 export const tempData = (() => {
 
@@ -63,6 +64,7 @@ export const toDoListManager = (() => {
   // add a single object (toDoListItem) into the toDoList Array
   const addToDoListItem = (toDoListItemObject) => {
     toDoList.push(toDoListItemObject);
+    pubsub.publish('todo/added',[toDoListItemObject])
   };
 
   // Temporary Update Function. Removes entire previous ToDo Item and replaces
@@ -102,6 +104,21 @@ export const toDoListManager = (() => {
     formData.append("completed", false);
     return formData;
   };
+
+  const createToDoListItem = (formData) => {
+    const appendedToDoFormData = appendToDoAttributes(formData);
+    const formDataObject = Object.fromEntries(appendedToDoFormData);
+    addToDoListItem(formDataObject);
+
+
+  }
+
+  const subscriptions = [
+  pubsub.subscribe('todo/submit/new', (formData) => {
+    createToDoListItem(formData);
+  }),
+  
+]
 
   return {
     appendToDoAttributes,

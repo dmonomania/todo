@@ -2,6 +2,7 @@ import { toDoListManager } from "./todolist.js";
 import { projectsManager } from "./todolist.js";
 import { formBuilding, toDoDomStuff, domSmashing } from './dombuild.js';
 import { accessLocalStorage } from "./storage.js";
+const pubsub = require('pubsub.js');
 
 
 
@@ -23,6 +24,7 @@ newToDoBtn.addEventListener('click',() => {
 window.onload = () => {
   const savedToDoList = accessLocalStorage.readStorage('toDoList');
   if (!savedToDoList.length == 0){
+    console.log('hello');
     toDoListManager.loadSavedToDoList(savedToDoList);
     toDoListManager.readToDoList().forEach((e) => {
       toDoDomStuff.printNextToDo(e);
@@ -32,18 +34,18 @@ window.onload = () => {
 }
 
 
-export const newToDoSubmit = (formData) => {
-  const appendedFormData = toDoListManager.appendToDoAttributes(formData);
-  const toDoListItemObject = Object.fromEntries(appendedFormData);
-  toDoListManager.addToDoListItem(toDoListItemObject);
-  // save current toDoList to Local Storage
-  accessLocalStorage.clearAndWrite('toDoList',toDoListManager.readToDoList())
+// export const newToDoSubmit = (formData) => {
+//   const appendedFormData = toDoListManager.appendToDoAttributes(formData);
+//   const toDoListItemObject = Object.fromEntries(appendedFormData);
+//   toDoListManager.addToDoListItem(toDoListItemObject);
+//   // save current toDoList to Local Storage
+//   accessLocalStorage.clearAndWrite('toDoList',toDoListManager.readToDoList())
   
-  // TODO: #2 decouple printNextToDo from the newToDoSubmit function. 
-  toDoDomStuff.printNextToDo(toDoListItemObject);
-  // Add 
+//   // TODO: #2 decouple printNextToDo from the newToDoSubmit function. 
+//   toDoDomStuff.printNextToDo(toDoListItemObject);
+//   // Add 
   
-};
+// };
 
 export const handleIconClicks = (task, target) => {
   switch (task){
@@ -64,7 +66,5 @@ export const handleIconClicks = (task, target) => {
             console.log(`handleIconClicks found no matches`)
           }
         }
-        
-        
         
         

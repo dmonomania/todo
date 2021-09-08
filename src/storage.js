@@ -1,4 +1,6 @@
 import { parse } from "uuid";
+const pubsub = require ('pubsub.js');
+import { toDoListManager } from "./todolist";
 
 export const accessLocalStorage = (()=>{
     // uses the function parameter as the localStorage key 
@@ -23,6 +25,11 @@ export const accessLocalStorage = (()=>{
 
     }
 
+    const subscriptions = [
+        pubsub.subscribe ('todo/added', () => {
+            clearAndWrite('toDoList',toDoListManager.readToDoList())
+        })
+    ]
     return {
         readStorage,
         clearAndWrite

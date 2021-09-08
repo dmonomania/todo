@@ -23,6 +23,7 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
+    "pubsub.js": "^1.5.2",
     "uuid": "^8.3.2"
   }
 }

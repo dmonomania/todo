@@ -1,5 +1,6 @@
 import { newToDoSubmit } from "./index.js";
 import { handleIconClicks } from "./index.js";
+const pubsub = require ('pubsub.js')
 
 export const formBuilding = (() => {
   const buildModal = (header) => {
@@ -157,7 +158,7 @@ export const formBuilding = (() => {
       e.preventDefault();
       let fd = new FormData(e.target);
       // TODO: #3 uncouple this function newToDoSubmit from this click event
-      newToDoSubmit(fd);
+      pubsub.publish('todo/submit/new',[fd]);
     });
 
     form.appendChild(submitButton);
@@ -246,6 +247,13 @@ export const toDoDomStuff = (()=>{
 
  toDosColumn.appendChild(container);
 }
+
+const subscriptions = [
+  pubsub.subscribe ('todo/added', (data) => {
+    printNextToDo(data);
+
+  })
+]
 
 return {
   printNextToDo
