@@ -1,6 +1,6 @@
 import { newToDoSubmit } from "./index.js";
 import { handleIconClicks } from "./index.js";
-const pubsub = require ('pubsub.js')
+const pubsub = require("pubsub.js");
 
 export const formBuilding = (() => {
   const buildModal = (header) => {
@@ -15,7 +15,7 @@ export const formBuilding = (() => {
     closeButton.setAttribute("class", "modal-overlay");
     closeButton.setAttribute("aria-label", "Close");
     modal.appendChild(closeButton);
-    // adds the event listener to close the modal 
+    // adds the event listener to close the modal
     closeButton.addEventListener("click", () => {
       domSmashing.removeElement(modal);
     });
@@ -37,7 +37,7 @@ export const formBuilding = (() => {
     modalHeader.appendChild(closeButton2);
     modalHeader.appendChild(headerTitle);
     modalContainer.appendChild(modalHeader);
-    // adds the event listener for closgin the modal. 
+    // adds the event listener for closgin the modal.
     closeButton2.addEventListener("click", () => {
       domSmashing.removeElement(modal);
     });
@@ -52,18 +52,17 @@ export const formBuilding = (() => {
 
     return modalBody;
   };
-  // creates the form body manually. Except for Project Selector 
+  // creates the form body manually. Except for Project Selector
   // which inserts the current list of projects (param: projectsArray)
   // param: object will be used to update the form with the current
   // todo item when the "edit" button is clicked instead of NEW ToDo
 
   // TODO: Each of the form sections should be created with a reusable function
-  // taking an ojbect as a parameter for each of the options. 
+  // taking an ojbect as a parameter for each of the options.
   // i.e. element : input, type : text, class: input-class, name: name, etc.
   const toDoFormBody = (projectsArray, object) => {
     const label = (labelClass, labelFor, innerText) => {
-
-      // simple <label> maker 
+      // simple <label> maker
       const label = document.createElement("label");
       label.innerHTML = `<label class='${labelClass}' for='${labelFor}'>${innerText}</label>`;
       return label;
@@ -86,23 +85,23 @@ export const formBuilding = (() => {
     titleInput.setAttribute("name", "title");
     titleInput.setAttribute("type", "text");
     titleInput.setAttribute("placeholder", "Title");
-    titleInput.setAttribute('required','required');
+    titleInput.setAttribute("required", "required");
     formGroup.appendChild(titleInput);
-    
+
     const descLabel = label("form-label", "description", "Description");
     formGroup.appendChild(descLabel);
-    
+
     const descInput = document.createElement("textarea");
-    descInput.setAttribute('required','required');
+    descInput.setAttribute("required", "required");
     descInput.setAttribute("name", "description");
     descInput.setAttribute("class", "form-input");
     descInput.setAttribute("placeholder", "Description");
     descInput.setAttribute("rows", "3");
     formGroup.appendChild(descInput);
-    
+
     const projectLabel = label("form-label", "project", "Project");
     formGroup.appendChild(projectLabel);
-    
+
     const projectSelect = document.createElement("select");
     projectSelect.setAttribute("name", "project");
     projectSelect.classList.add("form-select", "form-inline", "my-2");
@@ -115,7 +114,7 @@ export const formBuilding = (() => {
       });
     }
     formGroup.appendChild(projectSelect);
-    
+
     const priorityLabel = label("form-label", "priority", "Priority");
     formGroup.appendChild(priorityLabel);
     
@@ -151,15 +150,83 @@ export const formBuilding = (() => {
     submitButton.setAttribute("id", "submit");
     submitButton.classList.add("btn", "btn-primary");
     submitButton.innerText = "Add ToDo";
+    // checking if the request to build the form is for a New item or
+    // editing a current item. If it's an edit request, the item details will be
+    // filled in.
+    const toDoItem = object;
+    
+    if (toDoItem !== undefined) {
+      titleInput.value = toDoItem.title;
+      descInput.value = toDoItem.description;
+      projectSelect.value = toDoItem.project;
+      prioritySelect.value = toDoItem.priority;
+      dueDateInput.value = toDoItem.dueDate;
 
-    // event listener to submit the form
-    form.addEventListener("submit", (e) => {
-      domSmashing.removeElement(document.querySelector('.modal'));
-      e.preventDefault();
-      let fd = new FormData(e.target);
-      // TODO: #3 uncouple this function newToDoSubmit from this click event
-      pubsub.publish('todo/submit/new',[fd]);
-    });
+
+      const completedSatusLabel = label("form-label", "completed", "Completed Status");
+      formGroup.appendChild(completedSatusLabel);
+      
+      const completedSelect = document.createElement("select");
+      completedSelect.setAttribute("name", "completed");
+      completedSelect.classList.add("form-select", "form-inline", "my-2");
+      
+      const optionYes = document.createElement("option");
+      optionYes.innerText = "Yes";
+      const optionNo = document.createElement("option");
+      optionNo.innerText = "No";
+
+      completedSelect.appendChild(optionNo)
+      completedSelect.appendChild(optionYes)
+
+      let completedStatus = toDoItem.completed
+      console.log(completedStatus)
+      if (completedStatus === true) {
+        console.log('if is true')
+        optionYes.setAttribute('selected','selected');
+      }
+      else {
+        console.log('if is false')
+        optionNo.setAttribute('selected','selected');
+      }
+      
+
+
+      formGroup.appendChild(completedSelect)
+      
+      // const completedSatusLabel = document.createElement('label');
+      // completedSatusLabel.innerText = 'Task Completed';
+      // completedSatusLabel.classList.add('form-switch');
+      // const completedSatusInput = document.createElement('input');
+      // completedSatusInput.setAttribute('type','checkbox');
+      // completedSatusInput.setAttribute('name','completed');
+      // completedSatusInput.value = toDoItem.completed;
+      // const completedStatusIcon = document.createElement('i');
+      // completedStatusIcon.classList.add('form-icon');
+      // completedSatusLabel.appendChild(completedSatusInput)
+      // completedSatusLabel.appendChild(completedStatusIcon);
+      // form.appendChild(completedSatusLabel)
+
+      submitButton.innerText = 'Edit ToDo'
+
+      // event NEW ToDo list Item listener to submit the form
+      form.addEventListener("submit", (e) => {
+        domSmashing.removeElement(document.querySelector(".modal"));
+        e.preventDefault();
+        let fd = new FormData(e.target);
+        // TODO: #3 uncouple this function newToDoSubmit from this click event
+
+        pubsub.publish("todo/submit/edit", [[fd, toDoItem]]);
+      });
+    } else {
+      // event NEW ToDo list Item listener to submit the form
+      form.addEventListener("submit", (e) => {
+        domSmashing.removeElement(document.querySelector(".modal"));
+        e.preventDefault();
+        let fd = new FormData(e.target);
+        // TODO: #3 uncouple this function newToDoSubmit from this click event
+        pubsub.publish("todo/submit/new", [fd]);
+      });
+    }
 
     form.appendChild(submitButton);
 
@@ -183,79 +250,102 @@ export const domSmashing = (() => {
     element.parentNode.removeChild(element);
   };
 
+  const clearElement = (element) => {
+    element.innerHTML = ''
+  }
   return {
+    clearElement,
     removeElement,
   };
 })();
 
-
-// this function should handle of the DOM related changes for the 
-// ToDo List itself. Printing / Deleting / Changing Class(styles) 
-// 
-export const toDoDomStuff = (()=>{
-
+// this function should handle of the DOM related changes for the
+// ToDo List itself. Printing / Deleting / Changing Class(styles)
+//
+export const toDoDomStuff = (() => {
   const printNextToDo = (object) => {
-    
-    const icons = [
-      
-      'icon-edit','icon-delete','icon-check'
-      
-    ]
+    // arry of icons/buttons used for interacting with individual todo list items.
+    const icons = ["icon-edit", "icon-delete", "icon-check"];
+    // creates the icons, there are smaller ones for desktop and larger ones for mobile
+    // both have event listeners added
     const createIcons = (container) => {
-      for ( let i=0; i <= icons.length; i++){
-
-        const div = document.createElement('div');
-        div.classList.add('flex-centered', 'column', 'col-4', 'col-sm-4')
-        const icon1 = document.createElement('i');
-        icon1.classList.add('icon', icons[i], 'hide-sm')
-        const icon2 = document.createElement('i');
-        icon2.classList.add('icon', 'icon-2x', icons[i], 'show-sm')
+      for (let i = 0; i <= icons.length; i++) {
+        const div = document.createElement("div");
+        div.classList.add("flex-centered", "column", "col-4", "col-sm-4");
+        const icon1 = document.createElement("i");
+        icon1.classList.add("icon", icons[i], "hide-sm");
+        const icon2 = document.createElement("i");
+        icon2.classList.add("icon", "icon-2x", icons[i], "show-sm");
         div.appendChild(icon1);
         div.appendChild(icon2);
-        icon1.addEventListener('click',(e) => handleIconClicks(icons[i], e.path[3]))
-        icon2.addEventListener('click',(e) => handleIconClicks(icons[i], e.path[3]))
+        // event listener sends to handle icon clicks, but should be separated
+        // sends the icon value from the icons array and the click even path[3] which will
+        // be the container div for the todo list item
+        icon1.addEventListener("click", (e) =>
+          handleIconClicks(icons[i], e.path[3])
+        );
+        icon2.addEventListener("click", (e) =>
+          handleIconClicks(icons[i], e.path[3])
+        );
         container.appendChild(div);
-
       }
-        
-    }
+    };
+    // uses the function parameter "object" to fill in the todo list item
+    // title as well as assigning the tolist item ID to the container for
+    // lookup later
+    const toDoObject = object;
+    const toDosColumn = document.getElementById("to-dos-column");
+    const container = document.createElement("div");
+    container.classList.add("columns");
+    container.setAttribute("id", toDoObject.id);
 
-    const toDoObject = object
-    const toDosColumn = document.getElementById('to-dos-column')
-    const container = document.createElement('div');
-     container.classList.add('columns');
-     container.setAttribute('id',toDoObject.id);
-
-    const titleColumn = document.createElement('div');
-    titleColumn.classList.add('column', 'col-10')
-    const titleText = document.createElement('div');
-    titleText.classList.add('text-large');
+    const titleColumn = document.createElement("div");
+    titleColumn.classList.add("column", "col-10");
+    const titleText = document.createElement("div");
+    titleText.classList.add("text-large");
     titleText.innerText = toDoObject.title;
 
     titleColumn.appendChild(titleText);
     container.appendChild(titleColumn);
 
-    const iconColumn = document.createElement('div');
-    iconColumn.classList.add('columns','my-2','hide-sm');
-    createIcons(iconColumn)
+    const iconColumn = document.createElement("div");
+    iconColumn.classList.add("columns", "my-2", "hide-sm");
+    createIcons(iconColumn);
 
     container.appendChild(iconColumn);
 
-    const divider = document.createElement('div');
-    divider.classList.add('divider')
+    const divider = document.createElement("div");
+    divider.classList.add("divider");
     container.appendChild(divider);
 
- toDosColumn.appendChild(container);
-}
+    toDosColumn.appendChild(container);
+  };
 
-const subscriptions = [
-  pubsub.subscribe ('todo/added', (data) => {
-    printNextToDo(data);
+  const printToDos = (toDosArray) => {
+    let array = toDosArray
+    console.log(array);
+    array.forEach((e) => {
+    printNextToDo(e);
+    })
 
-  })
-]
+  }
 
-return {
-  printNextToDo
-}
-})()
+  const subscriptions = [
+
+    pubsub.subscribe("todo/added", (data) => {
+      printNextToDo(data);
+    }),
+
+    pubsub.subscribe('todo/change/*', (data) => {
+      console.log(data);
+      const container = document.getElementById('to-dos-column')
+      domSmashing.clearElement(container);
+      printToDos(data);
+    }),
+  ];
+
+  return {
+    printToDos,
+    printNextToDo,
+  };
+})();

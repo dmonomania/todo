@@ -24,9 +24,14 @@ export const accessLocalStorage = (()=>{
         localStorage[key] = JSON.stringify(value);
 
     }
+// subscriptions for the pub/sub model. Listening for changes to the ToDoList.
 
     const subscriptions = [
+        // subscription for a new todo item added. Full clear and backup.
         pubsub.subscribe ('todo/added', () => {
+            clearAndWrite('toDoList',toDoListManager.readToDoList())
+        }),
+        pubsub.subscribe ('todo/change/*', () => {
             clearAndWrite('toDoList',toDoListManager.readToDoList())
         })
     ]

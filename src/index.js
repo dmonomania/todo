@@ -24,11 +24,9 @@ newToDoBtn.addEventListener('click',() => {
 window.onload = () => {
   const savedToDoList = accessLocalStorage.readStorage('toDoList');
   if (!savedToDoList.length == 0){
-    console.log('hello');
+  
     toDoListManager.loadSavedToDoList(savedToDoList);
-    toDoListManager.readToDoList().forEach((e) => {
-      toDoDomStuff.printNextToDo(e);
-    })
+    toDoDomStuff.printToDos(toDoListManager.readToDoList());
 
   }
 }
@@ -50,7 +48,9 @@ window.onload = () => {
 export const handleIconClicks = (task, target) => {
   switch (task){
     case 'icon-edit':
-      console.log('icon-edit')
+      
+      const object = toDoListManager.returnSingleToDoListItem('id',target.id);
+      formBuilding.buildToDoForm('Edit ToDo',projectsManager.readProjects(),object)
       break;
       case 'icon-delete':
         console.log(target);

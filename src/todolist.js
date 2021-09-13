@@ -69,9 +69,10 @@ export const toDoListManager = (() => {
 
   // Temporary Update Function. Removes entire previous ToDo Item and replaces
   // with entirely new item. A better way will be to update individual key/value pairs.
-  const updateToDoListItem = (searchKey, searchKeyValue, toDoListItemArray) => {
+  const replaceToDoListItem = (searchKey, searchKeyValue, toDoListItemObject) => {
     deleteSingleToDoListItem(searchKey, searchKeyValue);
-    addToDoListItem(toDoListItemArray);
+    toDoList.push(toDoListItemObject);
+    pubsub.publish('todo/change/edit',[toDoList])
   };
 
   // Temporary Function to Update the Projects when a change has been made.
@@ -98,34 +99,69 @@ export const toDoListManager = (() => {
   const readToDoList = () => {
     return toDoList;
   };
-
+  
   const appendToDoAttributes = (formData) => {
     formData.append("id", uuidv4());
     formData.append("completed", false);
     return formData;
   };
-
+  
   const createToDoListItem = (formData) => {
     const appendedToDoFormData = appendToDoAttributes(formData);
     const formDataObject = Object.fromEntries(appendedToDoFormData);
     addToDoListItem(formDataObject);
+  }
+  
+  const updateToDoListItem = (data) => {
+    const newFormData = data[0];
+    const oldFormData = data[1];
 
+    newFormData.append('id',oldFormData.id);
+
+    const newToDoListObject = Object.fromEntries(newFormData);
+
+    if (newToDoListObject.completed === 'Yes') {
+      newToDoListObject.completed = true;
+    }
+    else {
+      newToDoListObject.completed = false;
+    }
+    
+    return newToDoListObject
 
   }
 
-  const subscriptions = [
+  const returnSingleToDoListItem = (key,value) => {
+    const index = toDoList.findIndex((element) => element[key] === value);
+    return toDoList[index];
+
+  }
+// need to build this
+  const trackToDoListChanges = (newItem, oldItem) => {
+
+  }
+
+  const toDoListSubscriptions = [
   pubsub.subscribe('todo/submit/new', (formData) => {
     createToDoListItem(formData);
   }),
+
+  pubsub.subscribe('todo/submit/edit', (data) => {
+
+    const updatedToDoListItem = updateToDoListItem(data)
+    trackToDoListChanges(updatedToDoListItem,data[1])
+    replaceToDoListItem('id',updatedToDoListItem.id,updatedToDoListItem)
+  })
   
 ]
 
   return {
+    returnSingleToDoListItem,
     appendToDoAttributes,
     loadSavedToDoList,
     addToDoListItem,
     readToDoList,
-    updateToDoListItem,
+    replaceToDoListItem,
     deleteSingleToDoListItem,
     tempUpdateProject,
   };
